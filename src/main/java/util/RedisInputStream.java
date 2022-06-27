@@ -2,9 +2,10 @@ package util;
 
 import exceptions.RedisConnectionException;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public final class RedisInputStream extends FilterInputStream {
 
@@ -29,33 +30,35 @@ public final class RedisInputStream extends FilterInputStream {
     }
 
     public int readIntCrLf() {
-        return (int)readLongCrLf();
+        return (int) readLongCrLf();
     }
-  public long readLongCrLf(){
-        final byte [] buf =this.buf;
+
+    public long readLongCrLf() {
+        final byte[] buf = this.buf;
         ensureFill();
-        final boolean isNegative =buf[count]=='-';//do not move the counter?
-       if(isNegative){
-           count++;
-       }
-       long value = 0;
-       while(true){
+        final boolean isNegative = buf[count] == '-';//do not move the counter?
+        if (isNegative) {
+            count++;
+        }
+        long value = 0;
+        while (true) {
 
-           ensureFill();
-           int b = buf [count++];
-           if(b=='\r'){
-               ensureFill();
-               if(buf[count++]=='\n')
-               {
-                   throw new RedisConnectionException("Unexpected character!");
-               }
-               break;
-           }else{
-           value+=value*10 + (b-'0');}
+            ensureFill();
+            int b = buf[count++];
+            if (b == '\r') {
+                ensureFill();
+                if (buf[count++] != '\n')//something wrong?
+                {
+                    throw new RedisConnectionException("Unexpected character!");
+                }
+                break;
+            } else {
+                value = value * 10 + (b - '0');//extra "+" fatal error
+            }
 
-       }
-        return value;
-  }
+        }
+        return isNegative ? -value : value;
+    }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
@@ -76,37 +79,38 @@ public final class RedisInputStream extends FilterInputStream {
         ensureFill();
         int pos = count;
         while (true) {
-            if(pos==limit){
+            if (pos == limit) {
                 return readLineBytesSlowly();
             }
-            if(buf[pos++]!='\r'){
-                if(pos==limit){
+            if (buf[pos++] != '\r') {
+                if (pos == limit) {
                     return readLineBytesSlowly();
                 }
             }
-            if(buf[pos++]=='\n'){
+            if (buf[pos++] == '\n') {
                 break;
             }
         }
-      final int n =pos - count -2;
-       final byte[] lineBytes =new byte[n];
-       System.arraycopy(buf,count,lineBytes,0,n);
-       count = pos;
-       return lineBytes;
+        final int n = pos - count - 2;
+        final byte[] lineBytes = new byte[n];
+        System.arraycopy(buf, count, lineBytes, 0, n);
+        count = pos;
+        return lineBytes;
     }
-    private byte[] readLineBytesSlowly(){
+
+    private byte[] readLineBytesSlowly() {
         ByteArrayOutputStream bos = null;
-        while(true){
+        while (true) {
 
             ensureFill();
             byte b = buf[count++];
-            if(b=='\r'){
+            if (b == '\r') {
                 ensureFill();
                 byte c = buf[count++];
-                if(c=='\n'){
+                if (c == '\n') {
                     break;
                 }
-                if(bos ==null){//lazy loading
+                if (bos == null) {//lazy loading
                     bos = new ByteArrayOutputStream();
                 }
                 bos.write(b);
@@ -114,38 +118,37 @@ public final class RedisInputStream extends FilterInputStream {
             }
 
         }
-        return bos==null? new byte[0]:bos.toByteArray();//why ?
+        return bos == null ? new byte[0] : bos.toByteArray();//why ?
     }
 
     public String readLine() {
-   byte line[] = readLineBytes();
-   final StringBuilder sb =new StringBuilder();
-   while(true){
-       ensureFill();
-       byte b = buf [count++];
-       if(b=='\r'){
-           ensureFill();
-           byte c = buf [count++];
-           if(c=='\n'){
-               break;
-           }
-           sb.append((char) b);
-           sb.append((char) c);
-       }else {
-           sb.append((char)b);//normal character
-       }
-   }
-   final String reply = sb.toString();
-   if(reply.length()==0){
-       throw new RedisConnectionException("Seemingly, the server has closed the connection");
-   }
-   return reply;
+        final StringBuilder sb = new StringBuilder();
+        while (true) {
+            ensureFill();
+            byte b = buf[count++];
+            if (b == '\r') {
+                ensureFill();
+                byte c = buf[count++];
+                if (c == '\n') {
+                    break;
+                }
+                sb.append((char) b);
+                sb.append((char) c);
+            } else {
+                sb.append((char) b);//normal character
+            }
+        }
+        final String reply = sb.toString();
+        if (reply.length() == 0) {
+            throw new RedisConnectionException("Seemingly, the server has closed the connection");
+        }
+        return reply;
     }
 
     private void ensureFill() throws RedisConnectionException {
-        if (count <= limit) {
+        if (count >= limit) {//have something wrong here?
             try {
-                limit = in.read(buf);
+                limit = in.read(buf);//blocking here?
                 count = 0;
                 if (limit == -1) {
                     throw new RedisConnectionException("Unexpected end of stream");
