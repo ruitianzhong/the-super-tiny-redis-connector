@@ -2,7 +2,7 @@ package commands;
 
 import util.SafeEncoder;
 
-public enum RedisCommand implements Rawable{
+public enum RedisCommand implements Rawable {
     SET, GET, KEYS, MSET, MGET, PING, DEL;
 
     @Override

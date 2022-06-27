@@ -1,3 +1,5 @@
+import commands.CommandArguments;
+import commands.CommandObject;
 import exceptions.RedisConnectionException;
 import util.RedisConfig;
 import util.RedisInputStream;
@@ -111,39 +113,40 @@ public class Connection {
 
     }
 
-    public String set(String key, String value) {
-
-        try {
-            redisOutputStream.write('*');
-            redisOutputStream.writeIntCrLf(3);
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(3);
-            redisOutputStream.write("SET".getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(key.length());
-            redisOutputStream.write(key.getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(value.length());
-            redisOutputStream.write(value.getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
-        } catch (IOException ioe) {
-            throw new RedisConnectionException(ioe);
-
+    public <T> T executeCommand(CommandObject<T> commandObject) {//T is very important
+        if (commandObject == null) {
+            throw new IllegalArgumentException("CommandObject is null.");
         }
+        sendCommand(commandObject.getArgs());
+        return commandObject.getBuilder().build(getOne());
+    }
+
+    private Object getOne() {
+        flush();
+        return protocolReadWithCheckingBroken();
+    }
+
+    private Object protocolReadWithCheckingBroken() {
+        if (isBroken) {
+            throw new RedisConnectionException("The connection is broken");
+        }
+        return Protocol.read(redisInputStream);
+    }
+
+    private void sendCommand(CommandArguments args) {
+        connect();
+        Protocol.sendCommand(args, redisOutputStream);
+    }
+
+    private void flush() {
         try {
             redisOutputStream.flush();
-            byte b = redisInputStream.readByte();
-            byte[] store = redisInputStream.readLineBytes();
-            return new String(store, StandardCharsets.UTF_8);
-
         } catch (IOException ioe) {
             isBroken = true;
             throw new RedisConnectionException(ioe);
         }
-
     }
+
 
     public String get(String key) {
         try {

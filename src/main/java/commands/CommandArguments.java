@@ -1,8 +1,9 @@
 package commands;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class CommandArguments {
+public class CommandArguments implements Iterable<Rawable>{
     private final ArrayList<Rawable> args;
 
     public CommandArguments(RedisCommand redisCommand) {
@@ -44,4 +45,12 @@ public class CommandArguments {
         return this;
     }
 
+ public int size()
+ {
+     return args.size();
+ }
+    @Override
+    public Iterator<Rawable> iterator() {
+        return args.iterator();
+    }
 }

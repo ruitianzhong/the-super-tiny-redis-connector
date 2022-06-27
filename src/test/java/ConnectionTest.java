@@ -1,3 +1,4 @@
+import commands.CommandObjects;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,13 +16,15 @@ public class ConnectionTest {
         }
         connection.disconnect();
     }
+
     @Test
     public void checkSet() throws InterruptedException {
         Connection connection = new Connection();
-        connection.connect();
-        System.out.println(connection.set("ruitian","012345678901234567890123456789"));
-        System.out.println(connection.get("ruitian"));
-        connection.disconnect();
+        CommandObjects commandObjects = new CommandObjects();
+        String s = connection.executeCommand(commandObjects.set("China", "zhongruitian"));
+        System.out.println(s);
+        String result=connection.executeCommand(commandObjects.get("China"));
+        System.out.println(result);
     }
 
 }
