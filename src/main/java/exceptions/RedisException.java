@@ -1,4 +1,4 @@
-package Exception;
+package exceptions;
 
 /**
  * @author ruitianzhong
