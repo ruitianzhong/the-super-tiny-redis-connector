@@ -1,6 +1,6 @@
-package util;
+package top.zhongruitian.util;
 
-import exceptions.RedisConnectionException;
+import top.zhongruitian.exceptions.RedisConnectionException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;

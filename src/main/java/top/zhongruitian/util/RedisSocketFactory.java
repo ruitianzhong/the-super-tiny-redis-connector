@@ -1,4 +1,4 @@
-package util;
+package top.zhongruitian.util;
 
 import java.net.Socket;
 

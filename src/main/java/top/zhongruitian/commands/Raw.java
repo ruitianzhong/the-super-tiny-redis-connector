@@ -1,4 +1,4 @@
-package commands;
+package top.zhongruitian.commands;
 
 public class Raw implements Rawable {
     private byte[] raw;

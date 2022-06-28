@@ -1,4 +1,4 @@
-package commands;
+package top.zhongruitian.commands;
 
 public class CommandObjects {
     public CommandObject<String> set(String key, String value) {

@@ -1,4 +1,5 @@
 import org.junit.Test;
+import top.zhongruitian.Redis;
 
 public class GetAndSetBenchmark {
     public static final int count = 100000;

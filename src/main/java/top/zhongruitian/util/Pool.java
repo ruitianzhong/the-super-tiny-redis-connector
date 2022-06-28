@@ -1,6 +1,6 @@
-package util;
+package top.zhongruitian.util;
 
-import exceptions.RedisException;
+import top.zhongruitian.exceptions.RedisException;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 

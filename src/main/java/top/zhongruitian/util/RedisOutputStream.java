@@ -1,4 +1,4 @@
-package util;
+package top.zhongruitian.util;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;

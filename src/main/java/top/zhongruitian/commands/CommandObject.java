@@ -1,4 +1,4 @@
-package commands;
+package top.zhongruitian.commands;
 
 public class CommandObject<T> {
     private Builder<T> builder;

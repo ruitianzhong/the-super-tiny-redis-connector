@@ -1,4 +1,4 @@
-package util;
+package top.zhongruitian.util;
 
 public class RedisConfig {
     private String password;

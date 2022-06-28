@@ -1,8 +1,8 @@
-package commands;
+package top.zhongruitian.commands;
 
-import util.SafeEncoder;
+import top.zhongruitian.util.SafeEncoder;
 
-import static util.SafeEncoder.encode;
+import static top.zhongruitian.util.SafeEncoder.encode;
 
 public class BuilderFactory {
     public static final Builder<String> SET = new Builder() {

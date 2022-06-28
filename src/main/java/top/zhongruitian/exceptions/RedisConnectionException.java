@@ -1,4 +1,4 @@
-package exceptions;
+package top.zhongruitian.exceptions;
 
 public class RedisConnectionException extends RedisException {
     private static final long serialVersionUID = 1L;

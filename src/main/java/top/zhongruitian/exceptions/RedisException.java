@@ -1,4 +1,4 @@
-package exceptions;
+package top.zhongruitian.exceptions;
 
 /**
  * @author ruitianzhong

@@ -1,6 +1,6 @@
-package commands;
+package top.zhongruitian.commands;
 
-import util.SafeEncoder;
+import top.zhongruitian.util.SafeEncoder;
 
 public class StringRaw extends Raw {
 

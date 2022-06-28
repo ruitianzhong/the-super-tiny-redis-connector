@@ -1,5 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
+import top.zhongruitian.Redis;
 
 import java.util.UUID;
 

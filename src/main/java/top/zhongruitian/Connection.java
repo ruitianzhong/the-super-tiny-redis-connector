@@ -1,8 +1,11 @@
-import commands.CommandArguments;
-import commands.CommandObject;
-import commands.RedisCommand;
-import exceptions.RedisConnectionException;
-import util.*;
+package top.zhongruitian;
+
+import top.zhongruitian.commands.CommandArguments;
+import top.zhongruitian.commands.CommandObject;
+import top.zhongruitian.commands.RedisCommand;
+import top.zhongruitian.exceptions.RedisConnectionException;
+import top.zhongruitian.util.*;
+
 
 import java.io.IOException;
 import java.net.Socket;

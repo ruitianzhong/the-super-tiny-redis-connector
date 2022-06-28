@@ -1,7 +1,9 @@
+package top.zhongruitian;
+
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-import util.RedisSocketFactory;
+import top.zhongruitian.util.RedisSocketFactory;
 
 public class ConnectionFactory implements PooledObjectFactory<Connection> {
     private RedisSocketFactory redisSocketFactory;

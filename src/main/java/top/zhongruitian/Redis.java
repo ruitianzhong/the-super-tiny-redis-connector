@@ -1,4 +1,6 @@
-import commands.CommandObjects;
+package top.zhongruitian;
+
+import top.zhongruitian.commands.CommandObjects;
 
 public class Redis {
     private Connection connection = null;

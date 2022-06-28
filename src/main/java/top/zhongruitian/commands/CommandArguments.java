@@ -1,4 +1,4 @@
-package commands;
+package top.zhongruitian.commands;
 
 import java.util.ArrayList;
 import java.util.Iterator;

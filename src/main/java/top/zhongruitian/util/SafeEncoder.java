@@ -1,4 +1,4 @@
-package util;
+package top.zhongruitian.util;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
