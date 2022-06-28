@@ -1,10 +1,8 @@
 import commands.CommandArguments;
 import commands.CommandObject;
+import commands.RedisCommand;
 import exceptions.RedisConnectionException;
-import util.RedisConfig;
-import util.RedisInputStream;
-import util.RedisOutputStream;
-import util.RedisSocketFactory;
+import util.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -71,6 +69,15 @@ public class Connection {
 
     public void close() {
         //TODO : support the connection pool
+        if (this.memberof != null) {
+            ConnectionPool pool = memberof;
+            this.memberof = null;
+            if (isBroken) {
+                pool.returnBrokenConnection(this);
+            } else {
+                pool.returnBrokenConnection(this);
+            }
+        } else disconnect();
     }
 
     public void disconnect() {
@@ -87,31 +94,7 @@ public class Connection {
         }
     }
 
-    public String ping() {
-        try {
-            redisOutputStream.write('*');
-            redisOutputStream.writeIntCrLf(1);
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(4);
-            redisOutputStream.write("PING".getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
 
-        } catch (IOException ioe) {
-            throw new RedisConnectionException(ioe);
-
-        }
-        try {
-            redisOutputStream.flush();
-            byte b = redisInputStream.readByte();
-            byte[] store = redisInputStream.readLineBytes();
-            return new String(store, StandardCharsets.UTF_8);
-
-        } catch (IOException ioe) {
-            isBroken = true;
-            throw new RedisConnectionException(ioe);
-        }
-
-    }
 
     public <T> T executeCommand(CommandObject<T> commandObject) {//T is very important
         if (commandObject == null) {
@@ -148,50 +131,29 @@ public class Connection {
     }
 
 
-    public String get(String key) {
-        try {
-            redisOutputStream.write('*');
-            redisOutputStream.writeIntCrLf(2);
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(3);
-            redisOutputStream.write("GET".getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
-            redisOutputStream.write((byte) '$');
-            redisOutputStream.writeIntCrLf(key.length());
-            redisOutputStream.write(key.getBytes(StandardCharsets.UTF_8));
-            redisOutputStream.writeCrLf();
+    public void setMemberof(ConnectionPool connectionPool) {
+        this.memberof = connectionPool;
+    }
 
-        } catch (IOException ioe) {
-            throw new RedisConnectionException(ioe);
+    public boolean isBroken() {
+        return isBroken;
+    }
 
+    public boolean ping(){
+        sendCommand(new CommandArguments(RedisCommand.PING));
+        String reply = SafeEncoder.encode((byte[]) getOne());
+        if ("PONG".equals(reply)){
+            return true;
+        }else {
+            return false;
         }
-        try {
-            redisOutputStream.flush();
-            System.out.println((char) redisInputStream.readByte());
-
-            final int len = redisInputStream.readIntCrLf();
-            System.out.println(len);
-            if (len == -1) {
-                return null;
-            }
-            byte[] read = new byte[len];
-
-            int offset = 0;
-            while (offset < len) {
-                final int size = redisInputStream.read(read, offset, (len - offset));
-                //write more than one line??
-                offset += size;
-            }
-            redisInputStream.readByte();
-            redisInputStream.readByte();
-
-            return new String(read, StandardCharsets.UTF_8);
-
-        } catch (IOException ioe) {
-            isBroken = true;
-            throw new RedisConnectionException(ioe);
-        }
-
+    }
+    public String quit() {
+        sendCommand(new CommandArguments(RedisCommand.QUIT));
+        String reply = SafeEncoder.encode((byte[]) getOne());
+        disconnect();
+        isBroken = true;
+        return reply;
     }
 
 
