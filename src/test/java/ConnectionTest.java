@@ -1,28 +1,69 @@
-import commands.CommandObjects;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
+
 public class ConnectionTest {
+    public static final int count = 10000;
+
     @Test
-    public void checkPing() throws InterruptedException {
-        Connection connection = new Connection();
-        connection.connect();
-        int i = 100;
-        while (i-- != 0) {
-
-
-            Thread.sleep(300);
+    public void checkPing() {
+        Redis redis = new Redis();
+        for (int i = 0; i < count; i++) {
+            Assert.assertEquals("PONG", redis.ping());
         }
-        connection.disconnect();
+        Assert.assertEquals("OK", redis.quit());
+    }
+
+
+    @Test
+    public void GetAndSetTest() {
+        Redis redis = new Redis();
+
+        for (int i = 0; i < count; i++) {
+            String key = UUID.randomUUID().toString(), value = UUID.randomUUID().toString();
+            redis.set(key, value);
+            Assert.assertEquals(value, redis.get(key));
+        }
+        redis.close();
     }
 
     @Test
-    public void checkSet() throws InterruptedException {
-        Connection connection = new Connection();
-        CommandObjects commandObjects = new CommandObjects();
-        String s = connection.executeCommand(commandObjects.set("China", "zhongruitian"));
-        System.out.println(s);
-        String result = connection.executeCommand(commandObjects.get("China"));
-        System.out.println(result);
+    public void flushAllTest() {
+        Redis redis = new Redis();
+        Assert.assertEquals("OK", redis.flushAll());
     }
+
+    @Test
+    public void GetSetPingTest() {
+        Redis redis = new Redis();
+        redis.flushAll();
+        for (int i = 0; i < count; i++) {
+            Assert.assertEquals("PONG", redis.ping());
+            String key = UUID.randomUUID().toString(), value = UUID.randomUUID().toString();
+            redis.set(key, value);
+            Assert.assertEquals(value, redis.get(key));
+        }
+        for (int i = 0; i < count; i++) {
+            Assert.assertEquals("PONG", redis.ping());
+            String key = UUID.randomUUID().toString(), value = UUID.randomUUID().toString();
+            redis.set(key, value);
+            Assert.assertEquals(value, redis.get(key));
+        }
+        for (int i = 0; i < count; i++) {
+            String key = UUID.randomUUID().toString(), value = UUID.randomUUID().toString();
+            redis.set(key, value);
+            Assert.assertEquals("PONG", redis.ping());
+            Assert.assertEquals(value, redis.get(key));
+        }
+        for (int i = 0; i < count; i++) {
+            String key = UUID.randomUUID().toString(), value = UUID.randomUUID().toString();
+            redis.set(key, value);
+            Assert.assertEquals(value, redis.get(key));
+            Assert.assertEquals("PONG", redis.ping());
+        }
+        redis.quit();
+    }
+
 
 }
