@@ -12,7 +12,8 @@ public class ConnectionFactory implements PooledObjectFactory<Connection> {
         this.port = port;
         this.host = host;
     }
-    public ConnectionFactory(){
+
+    public ConnectionFactory() {
 
     }
 
@@ -23,19 +24,19 @@ public class ConnectionFactory implements PooledObjectFactory<Connection> {
 
     @Override
     public void destroyObject(PooledObject<Connection> p) throws Exception {
-         final Connection connection = p.getObject();
-         if(connection.isConnected()){
-             if(!connection.isBroken()){
-            connection.quit();
-             }
-         }
+        final Connection connection = p.getObject();
+        if (connection.isConnected()) {
+            if (!connection.isBroken()) {
+                connection.quit();
+            }
+        }
         connection.close();
     }
 
     @Override
     public PooledObject<Connection> makeObject() throws Exception {
-        Connection connection =null;
-        connection=new Connection(host,port);
+        Connection connection = null;
+        connection = new Connection(host, port);
         connection.connect();
         return new DefaultPooledObject<>(connection);
     }
@@ -47,7 +48,7 @@ public class ConnectionFactory implements PooledObjectFactory<Connection> {
 
     @Override
     public boolean validateObject(PooledObject<Connection> p) {
-        Connection connection=p.getObject();
+        Connection connection = p.getObject();
         return connection.isConnected();
     }
 }

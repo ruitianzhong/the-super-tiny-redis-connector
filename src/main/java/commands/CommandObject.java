@@ -8,10 +8,12 @@ public class CommandObject<T> {
         this.builder = builder;
         this.args = args;
     }
-    public Builder<T> getBuilder(){
+
+    public Builder<T> getBuilder() {
         return this.builder;
     }
-    public CommandArguments getArgs(){
+
+    public CommandArguments getArgs() {
         return this.args;
     }
 

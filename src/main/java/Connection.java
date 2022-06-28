@@ -6,7 +6,6 @@ import util.*;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class Connection {
     private RedisOutputStream redisOutputStream = null;
@@ -95,7 +94,6 @@ public class Connection {
     }
 
 
-
     public <T> T executeCommand(CommandObject<T> commandObject) {//T is very important
         if (commandObject == null) {
             throw new IllegalArgumentException("CommandObject is null.");
@@ -139,15 +137,16 @@ public class Connection {
         return isBroken;
     }
 
-    public boolean ping(){
+    public boolean ping() {
         sendCommand(new CommandArguments(RedisCommand.PING));
         String reply = SafeEncoder.encode((byte[]) getOne());
-        if ("PONG".equals(reply)){
+        if ("PONG".equals(reply)) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
+
     public String quit() {
         sendCommand(new CommandArguments(RedisCommand.QUIT));
         String reply = SafeEncoder.encode((byte[]) getOne());

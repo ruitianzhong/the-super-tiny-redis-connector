@@ -1,8 +1,6 @@
 import commands.CommandObjects;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class ConnectionTest {
     @Test
     public void checkPing() throws InterruptedException {
@@ -23,7 +21,7 @@ public class ConnectionTest {
         CommandObjects commandObjects = new CommandObjects();
         String s = connection.executeCommand(commandObjects.set("China", "zhongruitian"));
         System.out.println(s);
-        String result=connection.executeCommand(commandObjects.get("China"));
+        String result = connection.executeCommand(commandObjects.get("China"));
         System.out.println(result);
     }
 

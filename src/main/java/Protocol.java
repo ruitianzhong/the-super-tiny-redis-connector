@@ -37,7 +37,8 @@ public class Protocol {
         switch (firstByte) {
             case '+':
                 return processStateCodeReply(ris);
-            case '$':return processBulkReply(ris);
+            case '$':
+                return processBulkReply(ris);
         }
         return null;
     }
