@@ -65,5 +65,11 @@ public class ConnectionTest {
         redis.quit();
     }
 
-
+    @Test
+    public void GetKeyIfNotExist() {
+        Redis redis = new Redis();
+        String s = redis.get("do not exist");
+        Assert.assertNull(s);
+        redis.quit();
+    }
 }

@@ -1,6 +1,7 @@
 import commands.CommandArguments;
 import commands.Rawable;
 import exceptions.RedisConnectionException;
+import exceptions.RedisException;
 import util.RedisInputStream;
 import util.RedisOutputStream;
 
@@ -39,8 +40,12 @@ public class Protocol {
                 return processStateCodeReply(ris);
             case '$':
                 return processBulkReply(ris);
+            case '-':
+                throw new RedisException("Error handling is not available.");
+            default:
+                throw new RedisException("current version do no support the protocol.");
         }
-        return null;
+
     }
 
     private static Object processStateCodeReply(RedisInputStream ris) {
@@ -49,6 +54,9 @@ public class Protocol {
 
     private static Object processBulkReply(RedisInputStream ris) {
         int count = ris.readIntCrLf();
+        if (count == -1) {
+            return null;
+        }
         byte[] buf = new byte[count];
         for (int i = 0; i < count; i++) {
             buf[i] = ris.readByte();
@@ -56,5 +64,10 @@ public class Protocol {
         ris.readByte();
         ris.readByte();
         return buf;
+    }
+
+    private Object processError(RedisInputStream ris) {
+        return null;
+        //TODO : error handling.
     }
 }
